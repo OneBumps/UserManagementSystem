@@ -127,9 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="management.cpp" />
     <ClCompile Include="UserManagement.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="management.h" />
+    <ClInclude Include="user.h" />
     <ClInclude Include="UserManagement.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
