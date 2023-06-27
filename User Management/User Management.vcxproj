@@ -127,13 +127,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="management.cpp" />
-    <ClCompile Include="UserManagement.cpp" />
+    <ClCompile Include="Init.cpp" />
+    <ClCompile Include="Sign.cpp" />
+    <ClCompile Include="Management.cpp" />
+    <ClCompile Include="User.cpp">
+      <SDLCheck Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</SDLCheck>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="management.h" />
-    <ClInclude Include="user.h" />
-    <ClInclude Include="UserManagement.h" />
+    <ClInclude Include="Hash.h" />
+    <ClInclude Include="Init.h" />
+    <ClInclude Include="Management.h" />
+    <ClInclude Include="Node.h" />
+    <ClInclude Include="Sign.h" />
+    <ClInclude Include="User.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

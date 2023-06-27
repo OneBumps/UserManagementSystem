@@ -15,21 +15,36 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="UserManagement.cpp">
+    <ClCompile Include="Management.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="management.cpp">
+    <ClCompile Include="Sign.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="User.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Init.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="UserManagement.h">
+    <ClInclude Include="User.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="user.h">
+    <ClInclude Include="Management.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="management.h">
+    <ClInclude Include="Sign.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Hash.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Init.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,90 +1,37 @@
 #pragma once
-// 用户类
 #include <string>
 using namespace std;
 
-struct ShoppingCart
-{
-    string productName;
-};
-struct Order
-{
-    string productName;
-};
-
 class User {
 private:
-    int id;
+    // 基本信息
+    unsigned int id;
     char username[30];
     char password[15];
-    ShoppingCart cart;
-    Order order;
+    bool isAdmin;
+    // 积分
+    unsigned int points;
+    // 购物车
+    char cartId[100];
+    // 订单号
+    char orderId[30];
+    static string setStringType(string str);
 public:
     User();
-    User(int, string, string, ShoppingCart, Order);
-    User()
-    {
-        id = 0;
-        strcpy(username, "");
-        strcpy(password, "");
-    }
-
-    User(int id, string username, string password, ShoppingCart cart, Order order)
-    {
-        this->id = id;
-        strcpy(this->username, username.c_str());
-        strcpy(this->password, password.c_str());
-        //this->cart = cart;
-        //this->order = order;
-    }
-
-    int getId()
-    {
-        return id;
-    }
-
-    void setId(int id)
-    {
-        this->id = id;
-    }
-
-    string getUsername()
-    {
-        return username;
-    }
-
-    void setUsername(string username)
-    {
-        strcpy(this->username, username.c_str());
-    }
-
-    string getPassword()
-    {
-        return password;
-    }
-
-    void setPassword(string password)
-    {
-        strcpy(this->password, password.c_str());
-    }
-
-    //string getCart()
-    //{
-    //    return cart.productName;
-    //}
-
-    //void setCart(ShoppingCart cart)
-    //{
-    //    this->cart = cart;
-    //}
-
-    //string getOrder()
-    //{
-    //    return order.productName;
-    //}
-
-    //void setOrder(Order order)
-    //{
-    //    this->order = order;
-    //}
+    User(unsigned int id, string username, string password, unsigned int points, string cartId, string orderId);
+    static void showDetails(User user, int op = 1);
+    unsigned int getId();
+    void setId(unsigned int id);
+    string getUsername();
+    void setUsername(string username);
+    string getPassword();
+    void setPassword(string password);
+    unsigned int getPoints();
+    void setPoints(unsigned int points);
+    string getCartId();
+    void setCartId(string cartId);
+    string getOrderId();
+    void setOrderId(string orderId);
+    bool getIsAdmin();
+    void setIsAdmin(bool isAdmin);
 };

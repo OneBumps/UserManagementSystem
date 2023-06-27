@@ -1,50 +1,90 @@
-#include "management.h"
-int show(Hash* hash)
+#include "Management.h"
+#include "init.h"
+using namespace std;
+int showAll(Hash* hash)
 {
     Node* p;
+    cout << "ID\t\t用户名\t\t密码\t\t积分\t\t购物车\t\t订单号" << endl;
     for (int i = 0; i < SIZE; i++)
     {
         p = hash->data[i];
         while (p != NULL)
         {
-            puts("----------------");
-            cout << "用户ID：" << p->data.getId() << endl;
-            cout << "用户名：" << p->data.getUsername() << endl;
-            cout << "密码：" << p->data.getPassword() << endl;
-            puts("----------------");
+            User::showDetails(p->data, 0);
             p = p->next;
         }
     }
+    cout << "---------------------------------------------------------------------------------------------------" << endl;
     return 0;
 }
-bool findUser(Hash* hash, User user, int op = 0) //op=0:查找用户信息，op=1:查找用户是否存在
+bool findUser(Hash* hash, int id, int op = 0) //op=0:查找用户信息，op=1:查找用户是否存在
 {
-    int pos = hashFunction(user.getId());
+    int pos = hashFunction(id);
     Node* p = hash->data[pos];
     if (p == NULL) return false;
     while (p != NULL)
     {
-        if (p->data.getId() == user.getId())
+        if (p->data.getId() == id)
         {
             if (op == 1) return true;
-            cout << "------用户信息------" << endl;
-            cout << "用户ID：" << p->data.getId() << endl;
-            cout << "用户名：" << p->data.getUsername() << endl;
-            cout << "密码：" << p->data.getPassword() << endl;
-            //cout << "购物车：" << p->data.getCart() <<endl;
-            //cout << "订单" << p->data.getOrder() <<endl;
-            cout << "--------------------" << endl;
+            system("cls");
+            cout << "-----------------------------------------------------------------------------------" << endl;
+            cout << "                           用户  " << id << "  详情  " << endl;
+            cout << "-----------------------------------------------------------------------------------" << endl;
+            User::showDetails(p->data);
             return true;
         }
         p = p->next;
     }
     return false;
 }
-bool addUser(Hash* hash, User user, int op = 1) //op=0:手动添加用户，op=1:从文件添加用户
+bool findUser(Hash* hash, string username, int op) //op=0:查找用户信息，op=1:查找用户是否存在
 {
-    if (op == 0 && findUser(hash, user, 1))
+    int pos = hashFunction(username);
+    Node* p = hash->data[pos];
+    if (p == NULL) return false;
+    while (p != NULL)
     {
-        puts("该用户已存在, 不能再添加了");
+        if (p->data.getUsername() == username)
+        {
+            if (op == 1) return true;
+            system("cls");
+            cout << "-----------------------------------------------------------------------------------" << endl;
+            cout << "                           用户  " << p->data.getId() << "  详情  " << endl;
+            cout << "-----------------------------------------------------------------------------------" << endl;
+            User::showDetails(p->data);
+            return true;
+        }
+        p = p->next;
+    }
+    return false;
+}
+bool findUser(Hash* hash, int id, User& user)
+{
+    int pos = hashFunction(id);
+    Node* p = hash->data[pos];
+    if (p == NULL) return false;
+    while (p != NULL)
+    {
+        if (p->data.getId() == id)
+        {
+            user.setId(p->data.getId());
+            user.setUsername(p->data.getUsername());
+            user.setPassword(p->data.getPassword());
+            user.setPoints(p->data.getPoints());
+            user.setCartId(p->data.getCartId());
+            user.setOrderId(p->data.getOrderId());
+            return true;
+        }
+        p = p->next;
+    }
+    return false;
+}
+bool addUser(Hash* hash, User user, int op = 1) //op=0:手动添加用户，op=1:从文件添加用户，op=2:用户注册， op=3:测试新的hash函数
+{
+    if ((op == 0 || op == 2) && findUser(hash, user.getId(), 1))
+    {
+        if(op == 0) puts("该用户已存在, 不能再添加了");
         return false;
     }
     Node* p = new Node();
@@ -56,9 +96,7 @@ bool addUser(Hash* hash, User user, int op = 1) //op=0:手动添加用户，op=1:从文件
 }
 bool delUser(Hash* hash, int id)
 {
-    User user;
-    user.setId(id);
-    if (id <= 0 || !findUser(hash, user, 1))
+    if (id <= 0 || !findUser(hash, id, 1))
     {
         puts("------------");
         printf("没有ID为%d的人员，无法删除！\n", id);
@@ -92,8 +130,6 @@ bool delUser(Hash* hash, int id)
                     puts(" --------------------------------------------");
                     puts(" -----------------您已删除用户----------------");
                     cout << "用户ID：" << pdel->data.getId() << endl;
-                    cout << "用户昵称：" << pdel->data.getUsername() << endl;
-                    cout << "用户密码：" << pdel->data.getPassword() << endl;
                     puts(" --------------------------------------------");
                     delete pdel;
                     hash->count--;
@@ -107,9 +143,7 @@ bool delUser(Hash* hash, int id)
 }
 bool change(Hash* hash, int id)
 {
-    User user;
-    user.setId(id);
-    if (id <= 0 && !findUser(hash, user, 0))
+    if (id <= 0 && !findUser(hash, id, 0))
     {
         puts("---------------");
         puts("  没有这个用户  ");
@@ -143,90 +177,106 @@ bool change(Hash* hash, int id)
         return false;
     }
 }
-bool save(Hash* hash)
-{
-    ofstream file("user_management.txt");
-    for (int i = 0; i < SIZE; i++)
-    {
-        Node* p = hash->data[i];
-        while (p != NULL)
-        {
-            file.write((char*)&p->data, sizeof(User));
-            p = p->next;
-        }
-    }
-    file.close();
-    return true;
-}
 
-bool load(Hash* hash)
-{
-    ifstream file("user_management.txt");
-    User user;
-    if (!file) return false;
-    while (file.read((char*)&user, sizeof(User)))
-    {
-        addUser(hash, user, 1);
-        hash->count++;
-    }
-    file.close();
-    return true;
-}
 int hashFunction(int key)
 {
     return key % SIZE;
 }
-void menu()
-{
-    puts("------请选择操作------");
-    puts("");
-    puts("1. 查看所有用户信息");
-    puts("2. 添加用户");
-    puts("3. 删除用户");
-    puts("4. 修改用户信息");
-    puts("5. 查找用户");
-    puts("6. 保存并退出");
-    puts("");
-    puts("----------------------");
+
+int hashFunction(const string& str) {
+    // 将字符串转换为Unicode编码序列
+    wstring unicodeStr;
+    for (size_t i = 0; i < str.length(); i++) {
+        unicodeStr += static_cast<wchar_t>(str[i]);
+    }
+    // 将Unicode编码序列转换为UTF-8字节序列
+    string newStr;
+    for (size_t i = 0; i < unicodeStr.length(); i++) {
+        int codepoint = static_cast<int>(unicodeStr[i]);
+        if (codepoint <= 0x7F) {
+            newStr += static_cast<char>(codepoint);
+        }
+        else if (codepoint <= 0x7FF) {
+            newStr += static_cast<char>(0xC0 | ((codepoint >> 6) & 0x1F));
+            newStr += static_cast<char>(0x80 | (codepoint & 0x3F));
+        }
+        else if (codepoint <= 0xFFFF) {
+            newStr += static_cast<char>(0xE0 | ((codepoint >> 12) & 0x0F));
+            newStr += static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F));
+            newStr += static_cast<char>(0x80 | (codepoint & 0x3F));
+        }
+    }
+    // 计算哈希值 使用BKDRHash
+    int seed = 31;
+    int hash = 0;
+    for (size_t i = 0; i < newStr.length(); i++) {
+        hash = (hash * seed) + newStr[i];
+    }
+    return hash;
 }
-int main()
+
+void showMenu()
 {
-    puts("在线零售商城 - 用户中心");
-    Hash* hash = new Hash();
-    if (!load(hash)) return 0;
+    puts("在线零售商城 - 用户中心 - 管理员面板");
+    puts(" ------请选择操作------");
+    puts("|");
+    puts("| 1. 显示所有用户信息");
+    puts("| 2. 添加用户");
+    puts("| 3. 删除用户");
+    puts("| 4. 修改用户信息");
+    puts("| 5. 查找用户");
+    puts("| 6. 保存并退出");
+    puts("| ");
+    puts(" ----------------------");
+}
+
+void openManagement(Hash* hash)
+{
     while (1)
     {
-        menu();
+        showMenu();
         int op;
         cin >> op;
         switch (op)
         {
         case 1: //查看所有用户信息
         {
-            show(hash);
+            system("cls");
+            puts("在线零售商城 - 用户中心 - 管理员面板");
+            showAll(hash);
             break;
         }
-        case 2: //添加用户
+        case 2: //导入用户
         {
-            puts("------正在添加用户信息------");
-            int id;
+            system("cls");
+            puts("在线零售商城 - 用户中心");
+            puts("------正在导入用户信息------");
+            unsigned int id;
             string username;
             string password;
-            puts("请输入用户ID：");
+            unsigned int points;
+            string cartId;
+            string orderId;
+            printf("用户ID：");
             cin >> id;
-            puts("请输入用户名：");
+            printf("用户名：");
             cin >> username;
-            puts("请输入密码：");
+            printf("密码：");
             cin >> password;
-            User user;
-            user.setId(id);
-            user.setUsername(username);
-            user.setPassword(password);
-            if (addUser(hash, user)) puts("添加成功");
+            printf("积分：");
+            cin >> points;
+            printf("购物车：");
+            cin >> cartId;
+            printf("订单号：");
+            cin >> orderId;
+            User user(id, username, password, points, cartId, orderId);
+            if (addUser(hash, user, 0)) puts("添加成功");
             break;
         }
         case 3: //删除用户
         {
+            system("cls");
+            puts("在线零售商城 - 用户中心 - 管理员面板");
             while (1)
             {
                 puts("------正在删除用户信息------");
@@ -242,6 +292,8 @@ int main()
         }
         case 4: //修改用户信息
         {
+            system("cls");
+            puts("在线零售商城 - 用户中心 - 管理员面板");
             puts("------正在查找用户信息------");
             puts("请输入用户ID：");
             int id;
@@ -251,17 +303,24 @@ int main()
         break;
         case 5: //查找用户
         {
+            system("cls");
+            puts("在线零售商城 - 用户中心 - 管理员面板");
             puts("------正在查找用户信息------");
             puts("请输入用户ID：");
             int id;
             cin >> id;
-            User user;
-            user.setId(id);
-            findUser(hash, user);
+            findUser(hash, id);
         }
         break;
         case 6: //保存并退出
-            if (save(hash)) return 0;
+            if (save(hash, 0))
+            {
+                system("cls");
+                puts("已正常关闭系统，所有数据已保存");
+                return;
+            }
+        default:
+            system("cls");
         }
     }
 }
