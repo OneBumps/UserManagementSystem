@@ -27,7 +27,10 @@
     <ClCompile Include="Init.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="IdAvl.cpp">
+    <ClCompile Include="AVLNode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UserFrame.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,7 +53,10 @@
     <ClInclude Include="Init.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="IdAvl.h">
+    <ClInclude Include="AVLNode.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UserFrame.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,10 +3,11 @@
 #include "management.h"
 using namespace std;
 // ±£´æÊı¾İµ½ÎÄ¼ş
-bool save(Hash* hash, const vector<unsigned int>& id, int op) //op=0:±£´æÈ«²¿Êı¾İ²¢ÍË³ö£¬op=1:±£´æ²¢ÖØĞÂ¼ÓÔØÊı¾İ
+bool save(Hash* hash, AVLNode*& root, int op) //op=0:±£´æÈ«²¿Êı¾İ²¢ÍË³ö£¬op=1:±£´æ²¢ÖØĞÂ¼ÓÔØÊı¾İ
 {
+    vector<pair<unsigned, int>> value = AVLNode::convertToSortedArray(root); // ½«AVLÊ÷×ª»»ÎªÓĞĞòÊı×é
     ofstream file_id("id.dat");
-    for (int value : id) file_id << value << " ";
+    for (pair<unsigned, int> v : value) file_id << v.first << " " << v.second << " "; // ½«ÓĞĞòÊı×éĞ´ÈëÎÄ¼ş
     file_id.close();
     ofstream file_user("user_management.dat");
     for (int i = 0; i < SIZE; i++)
@@ -14,6 +15,7 @@ bool save(Hash* hash, const vector<unsigned int>& id, int op) //op=0:±£´æÈ«²¿Êı¾
         Node* p = hash->data[i];
         while (p != NULL)
         {
+            // ½«¹şÏ£±íÖĞµÄÊı¾İĞ´ÈëÎÄ¼ş
             file_user.write((char*)&p->data, sizeof(User));
             p = p->next;
         }
@@ -22,7 +24,7 @@ bool save(Hash* hash, const vector<unsigned int>& id, int op) //op=0:±£´æÈ«²¿Êı¾
     return true;
 }
 // µ¼ÈëÎÄ¼şÊı¾İ
-bool load(Hash* hash, AVLNode* avl)
+bool load(Hash* hash, AVLNode*& avl)
 {
     ifstream file_id("id.dat");
     if (!file_id) // ÎÄ¼ş²»´æÔÚÔò´´½¨ÎÄ¼ş
@@ -31,22 +33,24 @@ bool load(Hash* hash, AVLNode* avl)
         cfile.close();
         load(hash, avl);
     }
-    vector<unsigned int> id;
+    vector<pair<unsigned, int>> id;
     unsigned int value;
-    while (file_id >> value) id.push_back(value);
+    int pos;
+    while (file_id >> value >> pos) id.push_back(make_pair(value, pos));// ´ÓÎÄ¼şÖĞ¶ÁÈ¡Êı¾İ
     file_id.close();
-    avl = AVLNode::convertToAVLTree(id);
+    avl = AVLNode::convertToAVLTree(id);// ½«Êı¾İµ¼ÈëAVLÊ÷
     ifstream file_user("user_management.dat");
     User user;
     if (!file_user) // ÎÄ¼ş²»´æÔÚÔò´´½¨ÎÄ¼ş
     {
         ofstream cfile("user_management.dat");
         cfile.close();
-        load(hash, nullptr);
+        load(hash, avl);
     }
     while (file_user.read((char*)&user, sizeof(User)))
     {
-        addUser(hash, user, 1);
+        // ÎÄ¼şÊı¾İµ¼Èë¹şÏ£±í
+        addUser(hash, user, avl, 1);
         hash->count++;
     }
     file_user.close();

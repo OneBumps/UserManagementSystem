@@ -1,7 +1,8 @@
 #pragma once
-#include "Hash.h"
 #include <vector>
+#include "Hash.h"
+#include "AVLNode.h"
 using namespace std;
-void signIn(Hash* hash, vector<unsigned int>& id);
-void signUp(Hash* hash, vector<unsigned int>& id);
-void choose(Hash* hash, vector<unsigned int>& id);
+void signIn(Hash* hash, AVLNode*& root);
+void signUp(Hash* hash, AVLNode*& root);
+void choose(Hash* hash, AVLNode*& root);

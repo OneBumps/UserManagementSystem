@@ -17,6 +17,32 @@ int showAll(Hash* hash)
     cout << "---------------------------------------------------------------------------------------------------" << endl;
     return 0;
 }
+
+bool findUserById(Hash* hash, unsigned int id, AVLNode* root)
+{
+    AVLNode* verifNode = AVLNode::searchNode(root, id);
+    if (verifNode != nullptr)
+    {
+        int pos = verifNode->getPos();
+        Node* p = hash->data[pos];
+        if (p == NULL) return false;
+        while (p != NULL)
+        {
+            if (p->data.getId() == id)
+            {
+                system("cls");
+                cout << "-----------------------------------------------------------------------------------" << endl;
+                cout << "                           用户  " << p->data.getUsername() << "  详情  " << endl;
+                cout << "-----------------------------------------------------------------------------------" << endl;
+                User::showDetails(p->data);
+                return true;
+            }
+            p = p->next;
+        }
+    }
+    else return false;
+}
+
 bool findUser(Hash* hash, string username, int op) //op=0:查找用户信息，op=1:查找用户是否存在
 {
     int pos = hashFunction(username);
@@ -61,7 +87,7 @@ bool findUser(Hash* hash, string username, User& user)
     return false;
 }
 
-bool addUser(Hash* hash, User user, int op = 1) //op=0:手动添加用户，op=1:从文件添加用户，op=2:用户注册， op=3:测试新的hash函数
+bool addUser(Hash* hash, User user, AVLNode*& root, int op) //op=0:手动添加用户，op=1:从文件添加用户，op=2:用户注册， op=3:测试新的hash函数
 {
     if ((op == 0 || op == 2) && findUser(hash, user.getUsername(), 1))
     {
@@ -71,12 +97,13 @@ bool addUser(Hash* hash, User user, int op = 1) //op=0:手动添加用户，op=1:从文件
     Node* p = new Node();
     p->data = user;
     int pos = hashFunction(user.getUsername());
+    if (op != 1) root = AVLNode::insertNode(root, make_pair(p->data.getId(), pos));
     p->next = hash->data[pos];
     hash->data[pos] = p;
     return true;
 }
 
-bool delUser(Hash* hash, string username)
+bool delUser(Hash* hash, AVLNode*& root, string username)
 {
     if (!findUser(hash, username, 1))
     {
@@ -93,6 +120,7 @@ bool delUser(Hash* hash, string username)
         Node* pdel = p->next;
         if (username == ppre->data.getUsername())
         {
+            root = AVLNode::removeNode(root, make_pair(ppre->data.getId(), pos));
             pdel = ppre;
             hash->data[pos] = ppre->next;
             puts(" ---------------");
@@ -108,6 +136,7 @@ bool delUser(Hash* hash, string username)
             {
                 if (username == pdel->data.getUsername())
                 {
+                    root = AVLNode::removeNode(root, make_pair(pdel->data.getId(), pos));
                     ppre->next = pdel->next;
                     puts(" --------------------------------------------");
                     puts(" -----------------您已删除用户----------------");
@@ -208,7 +237,7 @@ void showMenu()
     puts(" ----------------------");
 }
 
-void openManagement(Hash* hash, vector<unsigned int>& id)
+void openManagement(Hash* hash, AVLNode*& root)
 {
     system("cls");
     while (1)
@@ -249,7 +278,7 @@ void openManagement(Hash* hash, vector<unsigned int>& id)
             printf("订单号：");
             cin >> orderId;
             User user(id, username, password, points, cartId, orderId);
-            if (addUser(hash, user, 0)) puts("添加成功");
+            if (addUser(hash, user, root, 0)) puts("添加成功");
             break;
         }
         case 3: //删除用户
@@ -262,7 +291,7 @@ void openManagement(Hash* hash, vector<unsigned int>& id)
                 string username;
                 puts("请输入用户昵称:");
                 cin >> username;
-                if (delUser(hash, username)) puts("还要删除吗?[yes/no]");
+                if (delUser(hash, root, username)) puts("还要删除吗?[yes/no]");
                 else puts("删除失败！还要尝试吗?[yes/no]");
                 string op3;
                 cin >> op3;
@@ -285,14 +314,42 @@ void openManagement(Hash* hash, vector<unsigned int>& id)
             system("cls");
             puts("在线零售商城 - 用户中心 - 管理员面板");
             puts("------正在查找用户信息------");
-            puts("请输入用户昵称：");
-            string username;
-            cin >> username;
-            findUser(hash, username);
+            puts("");
+            puts("      请选择查找方式：");
+            puts("      1. 使用用户昵称查找");
+            puts("");
+            puts("      2. 使用Id查找");
+            puts("");
+            puts("---------------------------");
+            int choose;
+            cin >> choose;
+            system("cls");
+            if (choose == 1)
+            {
+                puts("请输入用户昵称：");
+                string username;
+                cin >> username;
+                findUser(hash, username);
+            }
+            else
+            {
+                puts("请输入用户ID：");
+                unsigned int id;
+                cin >> id;
+                if (!findUserById(hash, id, root))
+                {
+                    system("cls");
+                    cout << "使用ID" << id << "查找失败，试试使用昵称查找!" << endl;
+                    puts("未找到用户");
+                    int wait;
+                    puts("按任意键继续。。。");
+                    cin >> wait;
+                }
+            }
         }
         break;
         case 6: //保存并退出
-            if (save(hash, id, 0))
+            if (save(hash, root, 0))
             {
                 system("cls");
                 puts("已正常关闭系统，所有数据已保存");

@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "Hash.h"
-#include "IdAvl.h"
+#include "AVLNode.h"
 using namespace std;
-bool save(Hash* hash, const vector<unsigned int>& id, int op = 0);
-bool load(Hash* hash, AVLNode* avl);
+bool save(Hash* hash, AVLNode*& root, int op = 0);
+bool load(Hash* hash, AVLNode*& root);

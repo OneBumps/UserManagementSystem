@@ -128,21 +128,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Init.cpp" />
-    <ClCompile Include="IdAvl.cpp" />
+    <ClCompile Include="AVLNode.cpp" />
     <ClCompile Include="Sign.cpp" />
     <ClCompile Include="Management.cpp" />
     <ClCompile Include="User.cpp">
       <SDLCheck Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</SDLCheck>
     </ClCompile>
+    <ClCompile Include="UserFrame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Init.h" />
     <ClInclude Include="Management.h" />
     <ClInclude Include="Node.h" />
-    <ClInclude Include="IdAvl.h" />
+    <ClInclude Include="AVLNode.h" />
     <ClInclude Include="Sign.h" />
     <ClInclude Include="User.h" />
+    <ClInclude Include="UserFrame.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

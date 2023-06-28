@@ -4,9 +4,9 @@
 #include "Sign.h"
 #include "Hash.h"
 #include "init.h"
+#include "UserFrame.h"
 #include "management.h"
-#include "IdAvl.h"
-void signUp(Hash* hash, vector<unsigned int>& id)
+void signUp(Hash* hash, AVLNode*& root)
 {
     system("cls");
     puts("在线零售商城 - 用户中心");
@@ -22,10 +22,10 @@ void signUp(Hash* hash, vector<unsigned int>& id)
     printf("密码：");
     cin >> password;
     User user(userId, username, password, 0, "", "");
-    if (addUser(hash, user, 2))
+    if (addUser(hash, user, root, 2))
     {
         puts("注册成功，即将跳转到首页");
-        save(hash, id, 1);
+        save(hash, root, 1);
         Sleep(500);
         system("cls");
         return;
@@ -35,10 +35,11 @@ void signUp(Hash* hash, vector<unsigned int>& id)
         puts("用户ID重复，注册失败！");
         Sleep(500);
         system("cls");
-        signUp(hash, id);
+        signUp(hash, root);
     }
 }
-void signIn(Hash* hash, vector<unsigned int>& id)
+
+void signIn(Hash* hash, AVLNode*& root)
 {
     puts("在线零售商城 - 用户中心");
     string username;
@@ -56,8 +57,8 @@ void signIn(Hash* hash, vector<unsigned int>& id)
         system("cls");
         puts("正在进入系统...");
         Sleep(2000);
-        //if (user.getIsAdmin() == true) openManagement(hash);
-        openManagement(hash, id);
+        /*if (user.getIsAdmin() == true)*/ openManagement(hash, root);
+        //else showUserFrame(user);
         return;
     }
     else
@@ -72,10 +73,10 @@ void signIn(Hash* hash, vector<unsigned int>& id)
         system("cls");
         if (choice == 'E' || choice == 'e') return;
     }
-    signIn(hash, id);
+    signIn(hash, root);
 }
 
-void choose(Hash* hash, vector<unsigned int>& id)
+void choose(Hash* hash, AVLNode*& root)
 {
     while (1)
     {
@@ -94,13 +95,13 @@ void choose(Hash* hash, vector<unsigned int>& id)
         case '1':
         {
             system("cls");
-            signIn(hash, id);
+            signIn(hash, root);
             break;
         }
         case '2':
         {
             system("cls");
-            signUp(hash, id);
+            signUp(hash, root);
             break;
         }
         case 'E':;
@@ -113,9 +114,8 @@ void choose(Hash* hash, vector<unsigned int>& id)
 int main()
 {
     Hash* hash = new Hash();
-    vector<unsigned int> id;
     AVLNode* root = nullptr;
     if (!load(hash, root)) return 0;
-    choose(hash, id);
+    choose(hash, root);
     return 0;
 }

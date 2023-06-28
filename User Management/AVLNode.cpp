@@ -1,13 +1,17 @@
 #include <iostream>
-#include "IdAvl.h"
+#include "AVLNode.h"
 #include "Init.h"
 #include "Hash.h"
 using namespace std;
 
-AVLNode::AVLNode(unsigned int val) : value(val), balanceFactor(0), left(nullptr), right(nullptr) {}
+AVLNode::AVLNode(pair<unsigned, int> val) : balanceFactor(0), left(nullptr), right(nullptr)
+{
+    this->id = val.first;
+    this->pos = val.second;
+}
 
 // 构建AVL树
-AVLNode* AVLNode::buildAVLTree(const vector<unsigned int>& arr, int start, int end) {
+AVLNode* AVLNode::buildAVLTree(const vector<pair<unsigned, int>>& arr, int start, int end) {
     if (start > end) {
         return nullptr;
     }
@@ -48,7 +52,7 @@ AVLNode* AVLNode::buildAVLTree(const vector<unsigned int>& arr, int start, int e
 }
 
 // 将数组转换为AVL树
-AVLNode* AVLNode::convertToAVLTree(const vector<unsigned int>& arr) {
+AVLNode* AVLNode::convertToAVLTree(const vector<pair<unsigned, int>>& arr) {
     int size = arr.size();
     return buildAVLTree(arr, 0, size - 1);
 }
@@ -90,11 +94,11 @@ AVLNode* AVLNode::rotateRight(AVLNode* node) {
 }
 
 // 插入节点
-AVLNode* AVLNode::insertNode(AVLNode* root, unsigned int value) {
+AVLNode* AVLNode::insertNode(AVLNode* root, pair<unsigned, int> value) {
     if (root == nullptr) {
         return new AVLNode(value);
     }
-    if (value < root->value) {
+    if (value.first < root->id) {
         root->left = insertNode(root->left, value);
     }
     else {
@@ -102,7 +106,7 @@ AVLNode* AVLNode::insertNode(AVLNode* root, unsigned int value) {
     }
     updateBalanceFactor(root);
     if (root->balanceFactor > 1) {
-        if (value < root->left->value) {
+        if (value.first < root->left->id) {
             // 左-左情况
             root = rotateRight(root);
         }
@@ -113,7 +117,7 @@ AVLNode* AVLNode::insertNode(AVLNode* root, unsigned int value) {
         }
     }
     else if (root->balanceFactor < -1) {
-        if (value > root->right->value) {
+        if (value.first > root->right->id) {
             // 右-右情况
             root = rotateLeft(root);
         }
@@ -132,7 +136,7 @@ void AVLNode::inOrderTraversal(AVLNode* root) {
         return;
     }
     inOrderTraversal(root->left);
-    cout << root->value << " ";
+    cout << root->id << " ";
     inOrderTraversal(root->right);
 }
 
@@ -146,14 +150,14 @@ AVLNode* AVLNode::findSuccessor(AVLNode* node) {
 }
 
 // 删除节点
-AVLNode* AVLNode::removeNode(AVLNode* root, unsigned int value) {
+AVLNode* AVLNode::removeNode(AVLNode* root, pair<unsigned, int> value) {
     if (root == nullptr) {
         return nullptr;
     }
-    if (value < root->value) {
+    if (value.first < root->id) {
         root->left = removeNode(root->left, value);
     }
-    else if (value > root->value) {
+    else if (value.first > root->id) {
         root->right = removeNode(root->right, value);
     }
     else {
@@ -177,8 +181,10 @@ AVLNode* AVLNode::removeNode(AVLNode* root, unsigned int value) {
         else {
             // 要删除的节点有两个子节点
             AVLNode* successor = findSuccessor(root);
-            root->value = successor->value;
-            root->right = removeNode(root->right, successor->value);
+            pair<unsigned, int> temp;
+            root->id = successor->id;
+            root->pos = successor->pos;
+            root->right = removeNode(root->right, make_pair(root->id, root->pos));
         }
     }
     // 更新平衡因子
@@ -210,125 +216,123 @@ AVLNode* AVLNode::removeNode(AVLNode* root, unsigned int value) {
 }
 
 // 搜索节点
-AVLNode* AVLNode::searchNode(AVLNode* root, unsigned int value)
+AVLNode* AVLNode::searchNode(AVLNode* root, unsigned int id)
 {
-    if (root == nullptr || root->value == value) {
+    if (root == nullptr || root->id == id) {
         return root;
     }
-    if (value < root->value) {
-        return searchNode(root->left, value);
+    if (id < root->id) {
+        return searchNode(root->left, id);
     }
     else {
-        return searchNode(root->right, value);
+        return searchNode(root->right, id);
     }
 }
 
 // 中序遍历并保存为数组
-void AVLNode::inOrderTraversalToArray(AVLNode* root, vector<unsigned int>& result)
+void AVLNode::inOrderTraversalToArray(AVLNode* root, vector<pair<unsigned, int>>& result)
 {
     if (root == nullptr) {
         return;
     }
     inOrderTraversalToArray(root->left, result);
-    result.push_back(root->value);
+    result.push_back(make_pair(root->id, root->pos));
     inOrderTraversalToArray(root->right, result);
 }
 
 // 将AVL树中序遍历并保存为数组
-vector<unsigned int> AVLNode::convertToSortedArray(AVLNode* root) {
-    vector<unsigned int> result;
+vector<pair<unsigned, int>> AVLNode::convertToSortedArray(AVLNode* root) {
+    vector<pair<unsigned, int>> result;
     inOrderTraversalToArray(root, result);
     return result;
 }
 
-// 测试插入删除
-int AVLNode::testInsertAndDelete() {
-    AVLNode* root = nullptr;
-    // 插入示例数据
-    root = insertNode(root, 10);
-    root = insertNode(root, 20);
-    root = insertNode(root, 30);
-    root = insertNode(root, 40);
-    root = insertNode(root, 50);
-    root = insertNode(root, 25);
-    // 中序遍历打印结果
-    cout << "In-order traversal: ";
-    inOrderTraversal(root);
-    cout << endl;
-    // 删除节点
-    root = removeNode(root, 40);
-    // 中序遍历打印结果
-    cout << "In-order traversal after deletion: ";
-    inOrderTraversal(root);
-    cout << endl;
-    return 0;
-}
-
-// 测试搜索
-int AVLNode::testSearch() {
-    AVLNode* root = nullptr;
-    // 插入示例数据
-    root = insertNode(root, 10);
-    root = insertNode(root, 20);
-    root = insertNode(root, 30);
-    root = insertNode(root, 40);
-    root = insertNode(root, 50);
-    root = insertNode(root, 25);
-    // 搜索值为30的节点
-    AVLNode* result = searchNode(root, 40);
-    if (result != nullptr) cout << "Found: " << result->value << endl;
-    else cout << "Not found." << endl;
-    return 0;
-}
-
-// 测试转换为数组
-int AVLNode::AVLtoArray() {
-    AVLNode* root = nullptr;
-    // 插入示例数据
-    root = insertNode(root, 10);
-    root = insertNode(root, 20);
-    root = insertNode(root, 30);
-    root = insertNode(root, 40);
-    root = insertNode(root, 50);
-    root = insertNode(root, 25);
-    // 将AVL树中序遍历并保存为数组
-    vector<unsigned int> sortedArray = convertToSortedArray(root);
-    // 打印结果
-    cout << "Sorted Array: ";
-    for (int value : sortedArray) {
-        cout << value << " ";
-    }
-    cout << endl;
-    return 0;
-}
-
-// 测试转换为AVL树
-int AVLNode::testArrayToAVL() {
-    vector<unsigned int> arr = { 10, 20, 30, 40, 50, 25 };
-    // 将数组转换为AVL树
-    AVLNode* root = convertToAVLTree(arr);
-    // 中序遍历打印结果
-    cout << "In-order traversal: ";
-    inOrderTraversal(root);
-    cout << endl;
-    return 0;
-}
-
-// 测试保存和加载
-//int AVLNode::testSaveAndLoad() {
-//    Hash* hash = new Hash();
-//    vector<unsigned int> arr = { 10, 20, 30, 40, 50, 25 };
-//    // 将数组存储到文件中
-//    save(hash, arr);
-//    vector<unsigned int> arrs;
-//    // 从文件中读取数组
-//    load(hash, arrs);
+//// 测试插入删除
+//int AVLNode::testInsertAndDelete() {
+//    AVLNode* root = nullptr;
+//    // 插入示例数据
+//    root = insertNode(root, 10);
+//    root = insertNode(root, 20);
+//    root = insertNode(root, 30);
+//    root = insertNode(root, 40);
+//    root = insertNode(root, 50);
+//    root = insertNode(root, 25);
+//    // 中序遍历打印结果
+//    cout << "In-order traversal: ";
+//    inOrderTraversal(root);
+//    cout << endl;
+//    // 删除节点
+//    root = removeNode(root, 40);
+//    // 中序遍历打印结果
+//    cout << "In-order traversal after deletion: ";
+//    inOrderTraversal(root);
+//    cout << endl;
+//    return 0;
+//}
 //
-//    // 打印读取的数组
-//    cout << "Loaded Array: ";
-//    for (int value : arrs) {
+//// 测试搜索
+//int AVLNode::testSearch() {
+//    AVLNode* root = nullptr;
+//    // 插入示例数据
+//    root = insertNode(root, 10);
+//    root = insertNode(root, 20);
+//    root = insertNode(root, 30);
+//    root = insertNode(root, 40);
+//    root = insertNode(root, 50);
+//    root = insertNode(root, 25);
+//    // 搜索值为30的节点
+//    AVLNode* result = searchNode(root, 40);
+//    if (result != nullptr) cout << "Found: " << result->id << endl;
+//    else cout << "Not found." << endl;
+//    return 0;
+//}
+
+// AVl树转换为数组
+//int AVLNode::testAVLtoArray() {
+//    AVLNode* root = nullptr;
+//    // 插入示例数据
+//    root = insertNode(root, 10);
+//    root = insertNode(root, 20);
+//    root = insertNode(root, 30);
+//    root = insertNode(root, 40);
+//    root = insertNode(root, 50);
+//    root = insertNode(root, 25);
+//    // 将AVL树中序遍历并保存为数组
+//    vector<unsigned int> sortedArray = convertToSortedArray(root);
+//    // 打印结果
+//    cout << "Sorted Array: ";
+//    for (int value : sortedArray) {
 //        cout << value << " ";
 //    }
 //    cout << endl;
 //    return 0;
 //}
+
+//// 测试转换为AVL树
+//int AVLNode::testArrayToAVL() {
+//    vector<unsigned int> arr = { 10, 20, 30, 40, 50, 25 };
+//    // 将数组转换为AVL树
+//    AVLNode* root = convertToAVLTree(arr);
+//    // 中序遍历打印结果
+//    cout << "In-order traversal: ";
+//    inOrderTraversal(root);
+//    cout << endl;
+//    return 0;
+//}
+
+unsigned int AVLNode::getId()
+{
+    return id;
+}
+void AVLNode::setId(unsigned int val)
+{
+    this->id = val;
+}
+int AVLNode::getPos()
+{
+    return pos;
+}
+void AVLNode::setPos(int val)
+{
+    this->pos = val;
+}
