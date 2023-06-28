@@ -17,27 +17,6 @@ int showAll(Hash* hash)
     cout << "---------------------------------------------------------------------------------------------------" << endl;
     return 0;
 }
-bool findUser(Hash* hash, int id, int op = 0) //op=0:²éÕÒÓÃ»§ĞÅÏ¢£¬op=1:²éÕÒÓÃ»§ÊÇ·ñ´æÔÚ
-{
-    int pos = hashFunction(id);
-    Node* p = hash->data[pos];
-    if (p == NULL) return false;
-    while (p != NULL)
-    {
-        if (p->data.getId() == id)
-        {
-            if (op == 1) return true;
-            system("cls");
-            cout << "-----------------------------------------------------------------------------------" << endl;
-            cout << "                           ÓÃ»§  " << id << "  ÏêÇé  " << endl;
-            cout << "-----------------------------------------------------------------------------------" << endl;
-            User::showDetails(p->data);
-            return true;
-        }
-        p = p->next;
-    }
-    return false;
-}
 bool findUser(Hash* hash, string username, int op) //op=0:²éÕÒÓÃ»§ĞÅÏ¢£¬op=1:²éÕÒÓÃ»§ÊÇ·ñ´æÔÚ
 {
     int pos = hashFunction(username);
@@ -59,14 +38,15 @@ bool findUser(Hash* hash, string username, int op) //op=0:²éÕÒÓÃ»§ĞÅÏ¢£¬op=1:²éÕ
     }
     return false;
 }
-bool findUser(Hash* hash, int id, User& user)
+
+bool findUser(Hash* hash, string username, User& user)
 {
-    int pos = hashFunction(id);
+    int pos = hashFunction(username);
     Node* p = hash->data[pos];
     if (p == NULL) return false;
     while (p != NULL)
     {
-        if (p->data.getId() == id)
+        if (p->data.getUsername() == username)
         {
             user.setId(p->data.getId());
             user.setUsername(p->data.getUsername());
@@ -80,36 +60,38 @@ bool findUser(Hash* hash, int id, User& user)
     }
     return false;
 }
+
 bool addUser(Hash* hash, User user, int op = 1) //op=0:ÊÖ¶¯Ìí¼ÓÓÃ»§£¬op=1:´ÓÎÄ¼şÌí¼ÓÓÃ»§£¬op=2:ÓÃ»§×¢²á£¬ op=3:²âÊÔĞÂµÄhashº¯Êı
 {
-    if ((op == 0 || op == 2) && findUser(hash, user.getId(), 1))
+    if ((op == 0 || op == 2) && findUser(hash, user.getUsername(), 1))
     {
-        if(op == 0) puts("¸ÃÓÃ»§ÒÑ´æÔÚ, ²»ÄÜÔÙÌí¼ÓÁË");
+        if (op == 0) puts("¸ÃÓÃ»§ÒÑ´æÔÚ, ²»ÄÜÔÙÌí¼ÓÁË");
         return false;
     }
     Node* p = new Node();
     p->data = user;
-    int pos = hashFunction(user.getId());
+    int pos = hashFunction(user.getUsername());
     p->next = hash->data[pos];
     hash->data[pos] = p;
     return true;
 }
-bool delUser(Hash* hash, int id)
+
+bool delUser(Hash* hash, string username)
 {
-    if (id <= 0 || !findUser(hash, id, 1))
+    if (!findUser(hash, username, 1))
     {
         puts("------------");
-        printf("Ã»ÓĞIDÎª%dµÄÈËÔ±£¬ÎŞ·¨É¾³ı£¡\n", id);
+        puts("Ã»ÓĞÕâ¸öÓÃ»§");
         puts("------------");
         return false;
     }
     else
     {
-        int pos = hashFunction(id);
+        int pos = hashFunction(username);
         Node* p = hash->data[pos];
         Node* ppre = p;
         Node* pdel = p->next;
-        if (id == ppre->data.getId())
+        if (username == ppre->data.getUsername())
         {
             pdel = ppre;
             hash->data[pos] = ppre->next;
@@ -124,12 +106,12 @@ bool delUser(Hash* hash, int id)
         {
             while (pdel != NULL)
             {
-                if (id == pdel->data.getId())
+                if (username == pdel->data.getUsername())
                 {
                     ppre->next = pdel->next;
                     puts(" --------------------------------------------");
                     puts(" -----------------ÄúÒÑÉ¾³ıÓÃ»§----------------");
-                    cout << "ÓÃ»§ID£º" << pdel->data.getId() << endl;
+                    cout << "ÓÃ»§ID£º" << pdel->data.getId() << "   " << pdel->data.getUsername() << endl;
                     puts(" --------------------------------------------");
                     delete pdel;
                     hash->count--;
@@ -141,9 +123,10 @@ bool delUser(Hash* hash, int id)
         }
     }
 }
-bool change(Hash* hash, int id)
+
+bool change(Hash* hash, string username)
 {
-    if (id <= 0 && !findUser(hash, id, 0))
+    if (!findUser(hash, username, 0))
     {
         puts("---------------");
         puts("  Ã»ÓĞÕâ¸öÓÃ»§  ");
@@ -152,11 +135,11 @@ bool change(Hash* hash, int id)
     }
     else
     {
-        int pos = hashFunction(id);
+        int pos = hashFunction(username);
         Node* p = hash->data[pos];
         while (p != NULL)
         {
-            if (id == p->data.getId())
+            if (username == p->data.getUsername())
             {
                 puts("");
                 puts("------ÇëĞŞ¸Ä¸ÃÓÃ»§µÄĞÅÏ¢------");
@@ -176,11 +159,6 @@ bool change(Hash* hash, int id)
         puts("ĞŞ¸ÄÊ§°Ü£¬ÇëÖØÊÔ£¡");
         return false;
     }
-}
-
-int hashFunction(int key)
-{
-    return key % SIZE;
 }
 
 int hashFunction(const string& str) {
@@ -208,11 +186,11 @@ int hashFunction(const string& str) {
     }
     // ¼ÆËã¹şÏ£Öµ Ê¹ÓÃBKDRHash
     int seed = 31;
-    int hash = 0;
+    int key = 0;
     for (size_t i = 0; i < newStr.length(); i++) {
-        hash = (hash * seed) + newStr[i];
+        key = (key * seed) + newStr[i];
     }
-    return hash;
+    return abs(key) % SIZE;
 }
 
 void showMenu()
@@ -230,8 +208,9 @@ void showMenu()
     puts(" ----------------------");
 }
 
-void openManagement(Hash* hash)
+void openManagement(Hash* hash, vector<unsigned int>& id)
 {
+    system("cls");
     while (1)
     {
         showMenu();
@@ -280,10 +259,10 @@ void openManagement(Hash* hash)
             while (1)
             {
                 puts("------ÕıÔÚÉ¾³ıÓÃ»§ĞÅÏ¢------");
-                int id;
-                puts("ÇëÊäÈëÓÃ»§ID:");
-                cin >> id;
-                if (delUser(hash, id)) puts("»¹ÒªÉ¾³ıÂğ?[yes/no]");
+                string username;
+                puts("ÇëÊäÈëÓÃ»§êÇ³Æ:");
+                cin >> username;
+                if (delUser(hash, username)) puts("»¹ÒªÉ¾³ıÂğ?[yes/no]");
                 else puts("É¾³ıÊ§°Ü£¡»¹Òª³¢ÊÔÂğ?[yes/no]");
                 string op3;
                 cin >> op3;
@@ -295,10 +274,10 @@ void openManagement(Hash* hash)
             system("cls");
             puts("ÔÚÏßÁãÊÛÉÌ³Ç - ÓÃ»§ÖĞĞÄ - ¹ÜÀíÔ±Ãæ°å");
             puts("------ÕıÔÚ²éÕÒÓÃ»§ĞÅÏ¢------");
-            puts("ÇëÊäÈëÓÃ»§ID£º");
-            int id;
-            cin >> id;
-            change(hash, id);
+            puts("ÇëÊäÈëÓÃ»§êÇ³Æ£º");
+            string username;
+            cin >> username;
+            change(hash, username);
         }
         break;
         case 5: //²éÕÒÓÃ»§
@@ -306,14 +285,14 @@ void openManagement(Hash* hash)
             system("cls");
             puts("ÔÚÏßÁãÊÛÉÌ³Ç - ÓÃ»§ÖĞĞÄ - ¹ÜÀíÔ±Ãæ°å");
             puts("------ÕıÔÚ²éÕÒÓÃ»§ĞÅÏ¢------");
-            puts("ÇëÊäÈëÓÃ»§ID£º");
-            int id;
-            cin >> id;
-            findUser(hash, id);
+            puts("ÇëÊäÈëÓÃ»§êÇ³Æ£º");
+            string username;
+            cin >> username;
+            findUser(hash, username);
         }
         break;
         case 6: //±£´æ²¢ÍË³ö
-            if (save(hash, 0))
+            if (save(hash, id, 0))
             {
                 system("cls");
                 puts("ÒÑÕı³£¹Ø±ÕÏµÍ³£¬ËùÓĞÊı¾İÒÑ±£´æ");
