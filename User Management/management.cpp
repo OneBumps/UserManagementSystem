@@ -302,7 +302,7 @@ void openManagement(Hash* hash, AVLNode*& root)
         {
             system("cls");
             puts("在线零售商城 - 用户中心 - 管理员面板");
-            puts("------正在查找用户信息------");
+            puts("------正在修改用户信息------");
             puts("请输入用户昵称：");
             string username;
             cin >> username;

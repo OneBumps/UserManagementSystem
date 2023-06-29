@@ -73,8 +73,8 @@ void AVLNode::updateBalanceFactor(AVLNode* node) {
     node->balanceFactor = getHeight(node->left) - getHeight(node->right);
 }
 
-// 左旋转
-AVLNode* AVLNode::rotateLeft(AVLNode* node) {
+
+AVLNode* AVLNode::rotateLeft(AVLNode* node) {// 左旋转
     AVLNode* newRoot = node->right;
     node->right = newRoot->left;
     newRoot->left = node;
@@ -82,9 +82,7 @@ AVLNode* AVLNode::rotateLeft(AVLNode* node) {
     updateBalanceFactor(newRoot);
     return newRoot;
 }
-
-// 右旋转
-AVLNode* AVLNode::rotateRight(AVLNode* node) {
+AVLNode* AVLNode::rotateRight(AVLNode* node) {// 右旋转
     AVLNode* newRoot = node->left;
     node->left = newRoot->right;
     newRoot->right = node;
@@ -150,7 +148,7 @@ AVLNode* AVLNode::findSuccessor(AVLNode* node) {
 }
 
 // 删除节点
-AVLNode* AVLNode::removeNode(AVLNode* root, pair<unsigned, int> value) {
+AVLNode* AVLNode::removeNode(AVLNode*& root, pair<unsigned, int> value) {
     if (root == nullptr) {
         return nullptr;
     }
@@ -186,6 +184,10 @@ AVLNode* AVLNode::removeNode(AVLNode* root, pair<unsigned, int> value) {
             root->pos = successor->pos;
             root->right = removeNode(root->right, make_pair(root->id, root->pos));
         }
+    }
+    if (root == nullptr) {
+        puts("不能删除仅存的一个用户，系统出错！");
+        exit(0);
     }
     // 更新平衡因子
     updateBalanceFactor(root);

@@ -32,7 +32,7 @@ void signUp(Hash* hash, AVLNode*& root)
     }
     else
     {
-        puts("用户ID重复，注册失败！");
+        puts("用户ID或用户名重复，注册失败！");
         Sleep(500);
         system("cls");
         signUp(hash, root);

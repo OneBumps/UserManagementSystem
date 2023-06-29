@@ -29,7 +29,7 @@ public:
     int getPos();
     void setPos(int val);
     static AVLNode* insertNode(AVLNode* root, pair<unsigned, int> value); // 插入节点
-    static AVLNode* removeNode(AVLNode* root, pair<unsigned, int> value); // 删除节点
+    static AVLNode* removeNode(AVLNode*& root, pair<unsigned, int> value); // 删除节点
     static AVLNode* searchNode(AVLNode* root, unsigned int id); // 查找节点
     static AVLNode* convertToAVLTree(const vector<pair<unsigned, int>>& arr); // 将数组转换为AVL树
     static vector<pair<unsigned, int>> convertToSortedArray(AVLNode* root); // 将AVL树转换为数组
